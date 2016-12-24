@@ -116,6 +116,6 @@ class Docking(object):
 
 if __name__ == '__main__':
 	try:
-		docking=Docking([0, 2])
+		docking=Docking([0, 2]) #tri, cru, cir (0,1,2) 
 	except rospy.ROSInterruptException:
 		rospy.loginfo("Task 3 Finished")

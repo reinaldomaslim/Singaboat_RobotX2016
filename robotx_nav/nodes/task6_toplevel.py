@@ -9,7 +9,7 @@ import random
 import tf
 from sklearn.cluster import KMeans
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Point, Pose
+from geometry_msgs.msg import Point, Pose, Quaternion
 from visualization_msgs.msg import MarkerArray, Marker
 from move_base_forward import Forward
 from move_base_force_cancel import ForceCancel

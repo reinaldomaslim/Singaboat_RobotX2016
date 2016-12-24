@@ -9,7 +9,7 @@ import os
 import tf
 from sklearn.cluster import KMeans
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Point, Pose, Twist, Vector3
+from geometry_msgs.msg import Point, Pose, Twist, Vector3, Quaternion
 from visualization_msgs.msg import MarkerArray, Marker
 from tf.transformations import euler_from_quaternion
 from move_base_waypoint import MoveTo
@@ -62,10 +62,6 @@ class PassGates(object):
 		rospy.Subscriber("/odometry/filtered/global", Odometry, self.odom_callback, queue_size=50)
 		while not self.odom_received:
 			rospy.sleep(1)
-
-
-
-
 
 		init_position =np.array([self.x0, self.y0, 0])
 

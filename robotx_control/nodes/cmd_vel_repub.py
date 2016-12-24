@@ -35,7 +35,7 @@ class Cmd_Vel_Repub(object):
 
     def __init__(self):
         rospy.init_node('cmd_vel_repub', anonymous=True)
-        r = rospy.Rate(10)
+        r = rospy.Rate(0.1)
         rospy.Subscriber("cmd_vel_raw", Twist, callback=self.cmd_vel_callback, queue_size=10)
         rospy.Subscriber("imu/data", Imu, callback=self.imu_callback, queue_size=10)
         rospy.Subscriber("odom", Odometry, callback=self.odom_callback, queue_size=10)
@@ -49,16 +49,16 @@ class Cmd_Vel_Repub(object):
 
         #initialise pid variables
         #linear
-        self.Integrator_max_linear=500
-        self.Integrator_min_linear=-500
+        self.Integrator_max_linear=200
+        self.Integrator_min_linear=-200
 
         self.set_point_linear=0.0 #desired value,
         self.error_linear=0.0
         self.Derivator_linear=0.0
         self.Integrator_linear=0.0
         #angular
-        self.Integrator_max_angular=500
-        self.Integrator_min_angular=-500
+        self.Integrator_max_angular=200
+        self.Integrator_min_angular=-200
 
         self.set_point_angular=0.0
         self.error_angular=0.0

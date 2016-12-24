@@ -61,11 +61,11 @@ class Aiming(MoveBaseUtil):
         while (rospy.get_time() - start_time < self.duration) or not self.duration and not rospy.is_shutdown():
             if (sqrt((self.target.linear.x - self.x0)**2 + (self.target.linear.y - self.y0) ** 2) < self.radius):
                 rospy.loginfo("inside inner radius, corrects orientation to face box")
-                theta = atan2(self.box.y -self.y0, self.box.x - self.x0)
+                theta = atan2(self.box[1] -self.y0, self.box[0] - self.x0)
                 if (abs(atan2(sin(theta - self.yaw0), cos(theta - self.yaw0))) > self.angle_tolerance):
                     print "correcting", theta , self.yaw0
 
-                    aim_target=self.aim_to_box([self.box.x, self.box.y], 30) #recheck condition every 30s
+                    aim_target=self.aim_to_box([self.box[0], self.box[1]], 30) #recheck condition every 30s
 
                     rospy.sleep(1)
 

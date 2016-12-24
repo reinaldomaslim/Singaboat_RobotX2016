@@ -25,7 +25,7 @@ int prevforwardROS=1500;
 int prevturnROS=1500;
 
 double right_calib=1;
-double left_calib=1.1;
+double left_calib=1;
 
 
 
@@ -52,16 +52,14 @@ void setup() {
 }
 
 void loop() {
+    mode = pulseIn(RC4, HIGH, 25000); //
+    throttle = pulseIn(RC2, HIGH); // Read the pulse width of 
+    steering = pulseIn(RC3, HIGH); // each channel
+    forwardROS  = pulseIn(throttle_input, HIGH);
+    turnROS     = pulseIn(steering_input, HIGH);
 
-    throttle = pulseIn(RC2, HIGH, 25000); // Read the pulse width of 
-    steering = pulseIn(RC3, HIGH, 25000); // each channel
-    mode = pulseIn(RC4, HIGH, 25000); // 
-    
     throttle=constrain(throttle, 1100, 1900);
     steering=constrain(steering, 1100, 1900);
-    
-    forwardROS  = pulseIn(throttle_input, HIGH, 25000);
-    turnROS     = pulseIn(steering_input, HIGH, 25000);
 
     if (forwardROS==0){
       forwardROS=prevforwardROS;
@@ -73,16 +71,16 @@ void loop() {
 
     if((mode>1000) && (mode<1400)){
         //manual mode
-        forward   = map(throttle, 1100, 1900, -500, 500); //map values from RC
-        turn      = map(steering, 1100, 1900,-500, 500);
+        forward   = map(throttle, 1100, 1900, -1000, 1000); //map values from RC
+        turn      = map(steering, 1100, 1900,-1000, 1000);
         digitalWrite(modePin, HIGH);
         digitalWrite(estopPin, LOW);
     }
     else if((mode>1400) && (mode<2000)){
       
         //autonomous mode
-        forward   = map(forwardROS, 1100, 1900, -500, 500); //value is -500 to 500
-        turn      = map(turnROS, 1100, 1900, -500, 500);
+        forward   = map(forwardROS, 1100, 1900, -1000, 1000); //value is -500 to 500
+        turn      = map(turnROS, 1100, 1900, -1000, 1000);
         digitalWrite(modePin, LOW);
         digitalWrite(estopPin, LOW);
     }
@@ -93,7 +91,6 @@ void loop() {
         digitalWrite(estopPin, HIGH);
     }
     
-
     // constrain in case exceeds
     //forward = constrain(forward, -500, 500);
     //turn = constrain(turn, -500, 500);
@@ -115,8 +112,7 @@ void unicycleRun(int forward, int turn){
     int Ul_out;
 
     Ur=right_calib*(forward-turn); //here turning in cw is positive250
-    Ul=left_calib*(forward+turn); //750
-    //Ur & Ul ranges from -750 to 750 if right and left calibration factors = 1 
+    Ul=left_calib*(forward+turn); //750 
     //Ur=-Ur;
     //Ul=-Ul;
     Ur=constrain(Ur, -1000, 1000);
@@ -142,17 +138,17 @@ int mapToResistance(int input){
 
     int digitalStep;
 
-    if (input<=2000 && input>1550)
+    if (input<=2000 && input>1600)
     {
-        digitalStep = map(input,1551,2000, 80, 0); 
+        digitalStep = map(input,1600,2000, 80, 0); 
     }
-    if (input<=1550 && input>1450)
+    if (input<=1600 && input>1400)
     {
-        digitalStep =120;
+        digitalStep =130;
     }
-    if(input<=1450&&input>=1000)
+    if(input<=1400&&input>=1000)
     {
-        digitalStep = map(input,1000,1450,255,180); 
+        digitalStep = map(input,1000,1400,255,180); 
     }
 
     return digitalStep;
@@ -160,17 +156,21 @@ int mapToResistance(int input){
 
 void setMotor(int Right, int Left)
 {
+    digitalWrite(slaveSelectPin,LOW);
+    SPI.transfer(1); //adress of second potentiometer 01
+    SPI.transfer(Left);
+    digitalWrite(slaveSelectPin,HIGH);
+
+    delay(50);//wait
+    
     digitalWrite(slaveSelectPin,LOW);//take SS pin to low to select the chip
     SPI.transfer(0);//adress of the first potentiometer 00 (motor select)
     SPI.transfer(Right);//second data is digital value
     digitalWrite(slaveSelectPin,HIGH);//take SS pin high to deselect chip
 
-    delay(50);//wait
+    
 
-    digitalWrite(slaveSelectPin,LOW);
-    SPI.transfer(1); //adress of second potentiometer 01
-    SPI.transfer(Left);
-    digitalWrite(slaveSelectPin,HIGH);
+
 }
 
 void printValue()

@@ -40,7 +40,7 @@ class DetectDeliver(object):
 
 	map_dim = [[0, 40], [0, 40]]
 
-	MAX_DATA=3
+	MAX_DATA=5
 	x0, y0, yaw0= 0, 0, 0
 	symbol=[0 , 0]
 	symbols=np.zeros((MAX_DATA, 2)) #unordered list
@@ -72,7 +72,6 @@ class DetectDeliver(object):
 		#rospy.Subscriber("/shoot", MarkerArray, self.symbol_callback, queue_size = 50)
 		rospy.Subscriber("/finished_search_and_shoot", Int8, self.stop_shoot_callback, queue_size = 5)
 		self.shooting_pub= rospy.Publisher('/start_search_and_shoot', Int8, queue_size=5)
-		self.marker_pub= rospy.Publisher('/waypoint_markers', Marker, queue_size=5)
 
 		self.base_frame = rospy.get_param("~base_frame", "base_link")
 		self.fixed_frame = rospy.get_param("~fixed_frame", "map")
@@ -87,7 +86,7 @@ class DetectDeliver(object):
 		print("odom received")
 
 		print(self.symbol)
-		d=1
+		d=3
 		while not rospy.is_shutdown() and not self.station_seen:
 			target=[self.x0+d*math.cos(self.yaw0), self.y0+d*math.sin(self.yaw0), self.yaw0]
 
@@ -197,30 +196,6 @@ class DetectDeliver(object):
 			#stop aiming station
 			self.shooting_complete=True
 		
-
-	def random_walk(self):
-		""" create random walk points and more favor towards center """
-		x = random.gauss(np.mean(self.map_dim[0]), 0.25 * np.ptp(self.map_dim[0]))
-		y = random.gauss(np.mean(self.map_dim[1]), 0.25 * np.ptp(self.map_dim[1]))
-
-		return self.map_constrain(x, y)
-
-	def map_constrain(self, x, y):
-		""" constrain x and y within map """
-		if x > np.max(self.map_dim[0]):
-			x = np.max(self.map_dim[0])
-		elif x < np.min(self.map_dim[0]):
-			x = np.min(self.map_dim[0])
-		else:
-			x = x
-		if y > np.max(self.map_dim[1]):
-			y = np.max(self.map_dim[1])
-		elif y < np.min(self.map_dim[1]):
-			y = np.min(self.map_dim[1])
-		else:
-			y = y
-
-		return [x, y, 0]
 
 	def symbol_callback(self, msg):
 		if len(msg.markers)>0:
